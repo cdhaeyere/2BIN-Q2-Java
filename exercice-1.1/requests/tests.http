@@ -1,0 +1,22 @@
+### Read all texts
+GET {{baseUrl}}/texts
+
+### Read all texts filtered by level
+GET {{baseUrl}}/texts?level=easy
+
+### Read one text
+GET {{baseUrl}}/texts/1
+
+### Create a text
+POST {{baseUrl}}/texts
+Content-Type: application/json
+{
+  "content": "This is a text",
+  "level": "easy"
+}
+
+### Delete a text
+DELETE {{baseUrl}}/texts/1
+
+### Update a text
+PUT {{baseUrl}}/texts/1
