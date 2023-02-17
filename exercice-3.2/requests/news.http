@@ -1,0 +1,175 @@
+### Login the default user
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "login": "james",
+  "password": "password"
+}
+
+> {%
+  client.global.set("jamesToken", response.body.token);
+%}
+
+### View all news
+GET {{baseUrl}}/news
+Authorization: {{jamesToken}}
+
+### Add a piece of news with wrong publication status (send back an error)
+POST {{baseUrl}}/news
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title": "News 01",
+  "shortDescription": "magnifiques nouvelles",
+  "content": "...magnifiques nouvelles...",
+  "publicationStatus": "115000000"
+}
+
+### Add a piece of news without associated page
+POST {{baseUrl}}/news
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title": "News 01",
+  "shortDescription": "magnifiques nouvelles",
+  "content": "...magnifiques nouvelles...",
+  "publicationStatus": "hidden"
+}
+
+### Add another piece of news with associated page (check prior that page with id=2 exists)
+POST {{baseUrl}}/news
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title": "News 02",
+  "shortDescription": "En page 02 - news",
+  "content": "...page2 :  nouvelles...",
+  "publicationStatus": "hidden",
+  "associatedPage": {
+    "id": 2
+  }
+}
+
+### Update a piece of news
+PUT {{baseUrl}}/news/2
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title": "News 02",
+  "shortDescription": "En page 02 - news",
+  "content": "...page2 :  nouvelles...",
+  "publicationStatus": "published"
+}
+
+### Delete a piece of news
+DELETE {{baseUrl}}/news/2
+Authorization: {{jamesToken}}
+
+### Read a piece of news
+GET {{baseUrl}}/news/1
+Authorization: {{jamesToken}}
+
+
+### Add a piece of news with dangerous content
+POST {{baseUrl}}/news
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title": "<img src='#' onerror='alert(66666)'>",
+  "shortDescription": "En page 03 - news",
+  "content": "...page3 ...",
+  "publicationStatus": "published"
+}
+
+### Login with user john (creation 1st in auths.http script)
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "login": "john",
+  "password": "123"
+}
+
+> {%
+  client.global.set("johnToken", response.body.token);
+%}
+
+
+### View all news with john
+GET {{baseUrl}}/news
+Authorization: {{johnToken}}
+
+### Add a news for john (check prior that page with id=1 exists)
+POST {{baseUrl}}/news
+Content-Type: application/json
+Authorization: {{johnToken}}
+
+{
+  "title": "News from Johny",
+  "shortDescription": "En page 02 - news",
+  "content": "...page2 :  nouvelles...",
+  "publicationStatus": "published",
+  "associatedPage": {
+    "id": 2
+  }
+}
+
+### View all news with john
+GET {{baseUrl}}/news
+Authorization: {{johnToken}}
+
+### View all news with james
+GET {{baseUrl}}/news
+Authorization: {{jamesToken}}
+
+### Delete a resource which james is not the author
+### Delete a resource
+DELETE {{baseUrl}}/news/3
+Authorization: {{jamesToken}}
+
+### Update a resource which james is not the author
+### Update a resource
+PUT {{baseUrl}}/news/3
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title": "Former news from Johny",
+  "shortDescription": "En page 02 - news",
+  "content": "...page2 :  nouvelles...",
+  "publicationStatus": "published",
+  "associatedPage": {
+    "id": 2
+  }
+}
+
+### View all news when anonymous
+GET {{baseUrl}}/news
+
+### Add another piece of news to page 2
+POST {{baseUrl}}/news
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title": "News extra new",
+  "shortDescription": "voila...",
+  "content": "What if we would stop programming ?",
+  "publicationStatus": "hidden",
+  "associatedPage": {
+    "id": 2
+  }
+}
+### Read all news associated to a page with james
+GET {{baseUrl}}/news?page-id=2
+Authorization: {{jamesToken}}
+
+### Read all news associated to a page with john
+GET {{baseUrl}}/news?page-id=2
+Authorization: {{johnToken}}

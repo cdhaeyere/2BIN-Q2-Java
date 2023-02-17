@@ -1,0 +1,144 @@
+### Login the default user
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "login":"james",
+  "password":"password"
+}
+
+> {%
+    client.global.set("jamesToken", response.body.token);
+%}
+
+### View all pages
+GET {{baseUrl}}/pages
+Authorization: {{jamesToken}}
+
+### Add a page with wrong publication status (send back an error)
+POST {{baseUrl}}/pages
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title":"Page 01",
+  "content": "<h1>Home Page<h1><p>Hi!</p>",
+  "uri": "/home",
+  "publicationStatus": "115000000"
+}
+
+### Add a page
+POST {{baseUrl}}/pages
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title":"Page 01",
+  "content": "<h1>Home Page<h1><p>Hi!</p>",
+  "uri": "/home",
+  "publicationStatus": "hidden"
+}
+
+### Add another page
+POST {{baseUrl}}/pages
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title":"Page 02",
+  "content": "<h1>About<h1><p>We are...</p>",
+  "uri": "/about",
+  "publicationStatus": "hidden"
+}
+
+### Update a page
+PUT {{baseUrl}}/pages/2
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title":"Page 02",
+  "content": "<h1>About<h1><p>We are...</p>",
+  "uri": "/about",
+  "publicationStatus": "published"
+}
+
+### Delete a page
+DELETE {{baseUrl}}/pages/2
+Authorization: {{jamesToken}}
+
+### Read a page
+GET {{baseUrl}}/pages/1
+Authorization: {{jamesToken}}
+
+
+### Add a page with dangerous content
+POST {{baseUrl}}/pages
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title": "<img src='#' onerror='alert(66666)'>",
+  "content": "<h1>Dangerous<h1><p>Danger...</p>",
+  "uri": "/about",
+  "publicationStatus": "published"
+}
+
+### Login with user john (creation 1st in auths.http script)
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "login":"john",
+  "password":"123"
+}
+
+> {%
+    client.global.set("johnToken", response.body.token);
+%}
+
+
+### View all pages with john
+GET {{baseUrl}}/pages
+Authorization: {{johnToken}}
+
+### Add a page for john
+POST {{baseUrl}}/pages
+Content-Type: application/json
+Authorization: {{johnToken}}
+
+{
+  "title": "John's page",
+  "content": "....",
+  "uri": "/john",
+  "publicationStatus": "published"
+}
+
+### View all pages with john
+GET {{baseUrl}}/pages
+Authorization: {{johnToken}}
+
+### View all pages with james
+GET {{baseUrl}}/pages
+Authorization: {{jamesToken}}
+
+### Delete a resource which james is not the author
+### Delete a page
+DELETE {{baseUrl}}/pages/4
+Authorization: {{jamesToken}}
+
+### Update a resource which james is not the author
+### Delete a page
+PUT {{baseUrl}}/pages/4
+Content-Type: application/json
+Authorization: {{jamesToken}}
+
+{
+  "title": "Former John's page : now it's James' page !",
+  "content": "....",
+  "uri": "/john",
+  "publicationStatus": "hidden"
+}
+
+### View all pages when anonymous
+GET {{baseUrl}}/pages
